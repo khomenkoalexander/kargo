@@ -1,0 +1,19 @@
+target/
+*.class
+*.jar
+
+# local Kafka broker data (bundled dev mode)
+docker/kafka-data/
+
+# environment secrets
+docker/.env
+.env
+
+# CLI transfer progress sidecars
+*.kfile-send.progress
+*.kfile-recv.progress
+
+# IDE
+.idea/
+*.iml
+.vscode/
