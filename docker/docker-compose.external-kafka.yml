@@ -1,0 +1,35 @@
+---
+# External Kafka mode: starts only the backend.
+# Set KFILE_KAFKA_BOOTSTRAP to your external cluster in .env.
+# Topics must be pre-created — see docs/EXTERNAL_KAFKA.md.
+#
+# Usage: docker compose -f docker-compose.external-kafka.yml up -d
+
+services:
+
+  backend:
+    image: kafkafile-backend
+    build:
+      context: .
+      dockerfile: backend.Dockerfile
+    container_name: kafkafile-backend
+    ports:
+      - "${KFILE_BACKEND_PORT:-8080}:8080"
+    environment:
+      KFILE_BEARER_TOKEN: ${KFILE_BEARER_TOKEN:?KFILE_BEARER_TOKEN is required}
+      KFILE_KAFKA_BOOTSTRAP: ${KFILE_KAFKA_BOOTSTRAP:?KFILE_KAFKA_BOOTSTRAP is required}
+      KFILE_BACKEND_PORT: ${KFILE_BACKEND_PORT:-8080}
+      KFILE_INFO_TOPIC: ${KFILE_INFO_TOPIC:-xfer.info}
+      KFILE_DATA_TOPIC: ${KFILE_DATA_TOPIC:-xfer.data}
+      KFILE_DATA_PARTITIONS: ${KFILE_DATA_PARTITIONS:-6}
+      KFILE_WINDOW: ${KFILE_WINDOW:-10}
+      KFILE_MAX_CHUNK_BYTES: ${KFILE_MAX_CHUNK_BYTES:-4194304}
+      KFILE_TTL_OFFER: ${KFILE_TTL_OFFER:-1800}
+      KFILE_TTL_TRANSFER: ${KFILE_TTL_TRANSFER:-3600}
+    healthcheck:
+      test: ["CMD-SHELL", "curl -sf http://localhost:8080/api/v1/healthz | grep -q ok"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
+    restart: unless-stopped
