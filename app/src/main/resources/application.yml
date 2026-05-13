@@ -1,0 +1,34 @@
+server:
+  port: ${KFILE_BACKEND_PORT:8080}
+
+spring:
+  application:
+    name: kafkafile-backend
+  mvc:
+    async:
+      request-timeout: -1
+
+logging:
+  level:
+    com.kafkafile: INFO
+    org.apache.kafka: WARN
+    # Suppress broken-pipe / client-abort noise from Tomcat's async dispatch layer.
+    # These are expected when an SSE client disconnects while a heartbeat is in flight.
+    org.apache.catalina.core.ContainerBase: WARN
+
+kafkafile:
+  auth:
+    bearer-token: ${KFILE_BEARER_TOKEN:changeme}
+  kafka:
+    bootstrap-servers: ${KFILE_KAFKA_BOOTSTRAP:localhost:9092}
+    info-topic: ${KFILE_INFO_TOPIC:xfer.info}
+    data-topic: ${KFILE_DATA_TOPIC:xfer.data}
+    data-topic-partitions: ${KFILE_DATA_PARTITIONS:6}
+    consumer-group: ${KFILE_CONSUMER_GROUP:kafkafile-backend}
+  transfer:
+    ttl-offer-seconds: ${KFILE_TTL_OFFER:1800}
+    ttl-transfer-seconds: ${KFILE_TTL_TRANSFER:3600}
+    ttl-orphan-seconds: ${KFILE_TTL_ORPHAN:60}
+    sse-heartbeat-seconds: ${KFILE_SSE_HEARTBEAT:15}
+    max-chunk-bytes: ${KFILE_MAX_CHUNK_BYTES:4194304}
+    window: ${KFILE_WINDOW:10}
